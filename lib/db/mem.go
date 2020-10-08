@@ -17,8 +17,16 @@ type Pick struct {
 	Artist  string    `json:"artist"`
 }
 
-var Database = &DB {
+var Database = &DB{
 	Picks: make(map[uuid.UUID]Pick),
+}
+
+func (db *DB) GetList() []Pick {
+	l := make([]Pick, 0)
+	for _, p := range db.Picks {
+		l = append(l, p)
+	}
+	return l
 }
 
 func (db *DB) AddPick(p Pick) {
@@ -26,12 +34,13 @@ func (db *DB) AddPick(p Pick) {
 }
 
 func (db *DB) GetPickByPickID(id string) (*Pick, error) {
-	uuid, err := uuid.Parse(id); if err != nil {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
 		return nil, err
 	}
-	p, ok := db.Picks[uuid]; if !ok {
+	p, ok := db.Picks[uuid]
+	if !ok {
 		return nil, errors.New("pick not found")
 	}
 	return &p, nil
 }
-

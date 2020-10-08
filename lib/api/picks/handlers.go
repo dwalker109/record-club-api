@@ -1,20 +1,21 @@
-package api
+package picks
 
 import (
 	"encoding/json"
 	"github.com/dwalker109/record-club-api/lib/db"
+	"github.com/gorilla/mux"
 	"net/http"
-	"path"
 )
 
-func PicksIndex(w http.ResponseWriter, r *http.Request) {
+func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(db.Database.Picks)
+	json.NewEncoder(w).Encode(db.Database.GetList())
 }
 
-func PicksGet(w http.ResponseWriter, r *http.Request) {
-	p, err := db.Database.GetPickByPickID(path.Base(r.URL.Path))
+func HandleGet(w http.ResponseWriter, r *http.Request) {
+	pickID := mux.Vars(r)["pick_id"]
+	p, err := db.Database.GetPickByPickID(pickID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -25,10 +26,11 @@ func PicksGet(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
-func PicksPost(w http.ResponseWriter, r *http.Request) {
+func HandlePost(w http.ResponseWriter, r *http.Request) {
 	dec := json.NewDecoder(r.Body)
 	p := db.Pick{}
-	err := dec.Decode(&p); if err != nil {
+	err := dec.Decode(&p)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
