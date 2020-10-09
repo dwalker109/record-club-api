@@ -2,22 +2,31 @@ package picks
 
 import (
 	"encoding/json"
-	"github.com/dwalker109/record-club-api/lib/db"
+	"github.com/dwalker109/record-club-api/lib/model"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
+	p, err := GetAll()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(db.Database.GetList())
+	json.NewEncoder(w).Encode(p)
 }
 
 func HandleGet(w http.ResponseWriter, r *http.Request) {
-	pickID := mux.Vars(r)["pick_id"]
-	p, err := db.Database.GetPickByPickID(pickID)
+	id := mux.Vars(r)["pick_id"]
+	p, err := GetOne(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		log.Println(err)
 		return
 	}
 
@@ -28,12 +37,20 @@ func HandleGet(w http.ResponseWriter, r *http.Request) {
 
 func HandlePost(w http.ResponseWriter, r *http.Request) {
 	dec := json.NewDecoder(r.Body)
-	p := db.Pick{}
-	err := dec.Decode(&p)
-	if err != nil {
+	p := model.Pick{}
+	if err := dec.Decode(&p); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		log.Println(err)
 		return
 	}
-	db.Database.AddPick(p)
+
+	if err := AddOne(&p); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
+	json.NewEncoder(w).Encode(p)
 }
