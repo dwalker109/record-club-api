@@ -3,7 +3,7 @@ package picks
 import (
 	"encoding/json"
 	"github.com/dwalker109/record-club-api/lib/model"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 	"log"
 	"net/http"
 )
@@ -22,7 +22,7 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleGet(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["pick_id"]
+	id := chi.URLParam(r, "PickID")
 	p, err := GetOne(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)

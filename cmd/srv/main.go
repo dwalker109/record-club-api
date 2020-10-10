@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/dwalker109/record-club-api/lib/api/picks"
 	"github.com/dwalker109/record-club-api/lib/db"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 	"log"
 	"net/http"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 	db.Activate(db.SQLiteConn)
 
-	r := mux.NewRouter()
+	r := chi.NewRouter()
 	picks.Register(r)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
