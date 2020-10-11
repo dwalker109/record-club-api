@@ -24,6 +24,6 @@ func AddOne(p *model.Pick) error {
 	return r.Error
 }
 
-func DeleteOne(p *model.Pick) {
-	db.Conn.Delete(p)
-}
+//func DeleteOne(p *model.Pick) {
+//	db.Conn.Delete(p)
+//}
