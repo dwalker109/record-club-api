@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/dwalker109/record-club-api/lib/api/picks"
 	"github.com/dwalker109/record-club-api/lib/db"
+	"github.com/dwalker109/record-club-api/lib/domain/pick"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 	db.Activate(db.SQLiteConn)
+	runMigrations() //TODO! Add flag
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -22,4 +24,10 @@ func main() {
 	picks.Register(r)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func runMigrations() {
+	if err := db.Conn.AutoMigrate(&pick.Pick{}); err != nil {
+		panic("picks runMigrations failed")
+	}
 }
