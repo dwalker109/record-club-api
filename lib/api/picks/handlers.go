@@ -44,3 +44,13 @@ func HandlePost(w http.ResponseWriter, r *http.Request) {
 
 	render.Render(w, r, NewResponse(ent))
 }
+
+func HandleDelete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "PickID")
+	if err := pick.DeleteOne(id); err != nil {
+		render.Render(w, r, api.NewErrorResponse(http.StatusBadRequest, err))
+		return
+	}
+
+	render.Render(w, r, NewResponse(&pick.Entity{}))
+}

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"github.com/dwalker109/record-club-api/lib/api/picks"
 	"github.com/dwalker109/record-club-api/lib/db"
-	"github.com/dwalker109/record-club-api/lib/domain/pick"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	db.Activate(db.SQLiteConn)
-	runMigrations() //TODO! Add flag
+	defer db.Conn.Disconnect(context.Background())
+	runMigrations()
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -27,7 +27,5 @@ func main() {
 }
 
 func runMigrations() {
-	if err := db.Conn.AutoMigrate(&pick.Pick{}); err != nil {
-		panic("picks runMigrations failed")
-	}
+	//TODO! Mongo migrations, behind a flag
 }

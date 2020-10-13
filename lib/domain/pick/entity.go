@@ -2,21 +2,23 @@ package pick
 
 import (
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-type Pick struct {
-	gorm.Model
-	DTO
+type Entity struct {
+	PickID  uuid.UUID `bson:"_id,omitempty"`
+	ThemeID uuid.UUID `bson:"theme,omitempty"`
+	OwnerID uuid.UUID `bson:"owner,omitempty"`
+	Title   string    `bson:"title,omitempty"`
+	Artist  string    `json:"artist,omitempty"`
 }
 
-func (pick Pick) ToDTO() *DTO {
+func (ent Entity) ToDTO() *DTO {
 	return &DTO{
-		PickID:  pick.PickID,
-		ThemeID: pick.ThemeID,
-		OwnerID: pick.OwnerID,
-		Title:   pick.Title,
-		Artist:  pick.Artist,
+		PickID:  ent.PickID,
+		ThemeID: ent.ThemeID,
+		OwnerID: ent.OwnerID,
+		Title:   ent.Title,
+		Artist:  ent.Artist,
 	}
 }
 
@@ -28,8 +30,12 @@ type DTO struct {
 	Artist  string    `json:"artist"`
 }
 
-func (dto DTO) ToEntity() *Pick {
-	return &Pick{
-		DTO: dto,
+func (dto DTO) ToEntity() *Entity {
+	return &Entity{
+		PickID:  dto.PickID,
+		ThemeID: dto.ThemeID,
+		OwnerID: dto.OwnerID,
+		Title:   dto.Title,
+		Artist:  dto.Artist,
 	}
 }

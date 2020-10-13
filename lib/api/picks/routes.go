@@ -9,6 +9,7 @@ func Register(r *chi.Mux) {
 		r.Get("/", HandleIndex)
 		r.Post("/", HandlePost)
 		r.Get("/{PickID}", HandleGet)
+		r.Delete("/{PickID}", HandleDelete)
 	})
 
 }
