@@ -1,4 +1,4 @@
-package db
+package svc
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var Conn *mongo.Client
+var MongoClient *mongo.Client
 
 func init() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -18,5 +18,5 @@ func init() {
 		panic(err)
 	}
 
-	Conn = client
+	MongoClient = client
 }

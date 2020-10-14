@@ -1,9 +1,8 @@
 package main
 
 import (
-	"context"
 	"github.com/dwalker109/record-club-api/lib/api/picks"
-	"github.com/dwalker109/record-club-api/lib/db"
+	"github.com/dwalker109/record-club-api/lib/svc"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -12,7 +11,7 @@ import (
 )
 
 func main() {
-	defer db.Conn.Disconnect(context.Background())
+	defer svc.Ctr.Shutdown()
 	runMigrations()
 
 	r := chi.NewRouter()

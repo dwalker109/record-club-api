@@ -2,12 +2,12 @@ package pick
 
 import (
 	"context"
-	"github.com/dwalker109/record-club-api/lib/db"
+	"github.com/dwalker109/record-club-api/lib/svc"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var collection = db.Conn.Database("rc").Collection("picks")
+var collection = svc.Ctr.GetDBClient().Database("rc").Collection("picks")
 var ctx = context.Background()
 
 func GetAll() (*[]Entity, error) {
