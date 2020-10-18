@@ -3,50 +3,39 @@ package pick
 import (
 	"context"
 	"github.com/dwalker109/record-club-api/lib/svc"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var collection = svc.Ctr.GetDBClient().Database("rc").Collection("picks")
 var ctx = context.Background()
 
-func GetAll() (*[]Entity, error) {
+func GetThemePicks(themeID primitive.ObjectID) (*[]Entity, error) {
+	return doGet(&bson.D{{"theme_id", themeID}})
+}
+
+func GetThemePicksForOwner(themeID, ownerID primitive.ObjectID) (*[]Entity, error) {
+	return doGet(&bson.D{{"theme_id", themeID}, {"owner_id", ownerID}})
+}
+
+func doGet(filter *bson.D) (*[]Entity, error) {
 	var ents []Entity
 
-	cursor, err := collection.Find(ctx, bson.D{})
+	cursor, err := collection.Find(ctx, *filter)
 	if err != nil {
 		return &ents, err
 	}
 
-	if err := cursor.All(ctx, &ents); err != nil {
-		return &ents, err
-	}
+	err = cursor.All(ctx, &ents)
 
-	return &ents, nil
+	return &ents, err
 }
 
-func GetOne(id string) (*Entity, error) {
-	p, _ := uuid.Parse(id)
-	var ent Entity
-
-	err := collection.FindOne(ctx, bson.M{"_id": p}).Decode(&ent)
-	if err != nil {
-		return &ent, err
-	}
-
-	return &ent, nil
-
-}
-
-func AddOne(e *Entity) error {
-	_, err := collection.InsertOne(ctx, e)
-
-	return err
-}
-
-func DeleteOne(id string) error {
-	p, _ := uuid.Parse(id)
-	_, err := collection.DeleteOne(ctx, bson.M{"_id": p})
+func AddOrUpdateThemePicksForOwner(ent *Entity) error {
+	opts := options.Update().SetUpsert(true)
+	filter := bson.D{{"theme_id", ent.ThemeID}, {"owner_id", ent.OwnerID}}
+	_, err := collection.UpdateOne(ctx, filter, bson.D{{"$set", ent}}, opts)
 
 	return err
 }

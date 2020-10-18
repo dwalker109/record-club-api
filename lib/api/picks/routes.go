@@ -6,10 +6,10 @@ import (
 
 func Register(r *chi.Mux) {
 	r.Route("/v1/picks", func(r chi.Router) {
-		r.Get("/", HandleIndex)
-		r.Post("/", HandlePost)
-		r.Get("/{PickID}", HandleGet)
-		r.Delete("/{PickID}", HandleDelete)
+		r.Get("/{ThemeID}", HandleIndexTheme)
+		r.Get("/{ThemeID}/{OwnerID}", HandleIndexThemeAndOwner)
+		r.Post("/{ThemeID}/{OwnerID}", HandlePostAndPut)
+		r.Put("/{ThemeID}/{OwnerID}", HandlePostAndPut)
 	})
 
 }

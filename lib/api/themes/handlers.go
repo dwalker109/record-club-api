@@ -40,6 +40,7 @@ func HandlePost(w http.ResponseWriter, r *http.Request) {
 	ent := dto.ToEntity()
 	ent.OwnerID = EnsureOID(ent.OwnerID)
 	ent.ThemeID = EnsureOID(ent.ThemeID)
+	ent.Quantity = 5
 
 	if err := theme.AddOne(ent); err != nil {
 		render.Render(w, r, api.NewErrorResponse(http.StatusBadRequest, err))
