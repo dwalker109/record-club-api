@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/dwalker109/record-club-api/lib/api/oauth/spotify"
 	"github.com/dwalker109/record-club-api/lib/api/picks"
 	"github.com/dwalker109/record-club-api/lib/api/themes"
 	"github.com/dwalker109/record-club-api/lib/svc"
@@ -23,6 +24,7 @@ func main() {
 	render.SetContentType(render.ContentTypeJSON)
 	picks.Register(r)
 	themes.Register(r)
+	spotify.Register(r)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
