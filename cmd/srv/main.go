@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/dwalker109/record-club-api/lib/api/oauth/spotify"
 	"github.com/dwalker109/record-club-api/lib/api/picks"
 	"github.com/dwalker109/record-club-api/lib/api/themes"
@@ -8,8 +11,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
-	"log"
-	"net/http"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 	r.Use(middleware.Logger)
 
 	render.SetContentType(render.ContentTypeJSON)
+
 	picks.Register(r)
 	themes.Register(r)
 	spotify.Register(r)

@@ -3,23 +3,36 @@ package spotify
 import (
 	"errors"
 	"fmt"
+	"github.com/dchest/uniuri"
+	"io/ioutil"
+	"net/http"
+	"time"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dwalker109/record-club-api/lib/api"
 	"github.com/go-chi/render"
 	"github.com/zmb3/spotify"
-	"io/ioutil"
-	"net/http"
-	"time"
 )
 
-var callbackURL string = "http://localhost:8080/oauth-sp-cb"
-var stateTMP = "123"
+var callbackURL string = "http://localhost:3000/oauth/spotify-cb"
+var stateCookieName = "state"
 var auth = spotify.NewAuthenticator(callbackURL, spotify.ScopeUserReadPrivate)
+var HMACKey = []byte(uniuri.NewLen(256))
 
-var HMACKey = []byte("theendisthebeginningistheend")
+func HandleGetAuthRedirectURL(w http.ResponseWriter, r *http.Request) {
+	stateCookieValue := uniuri.New()
+	url := auth.AuthURL(stateCookieValue)
 
-func HandleGetAuthRedirectUrl(w http.ResponseWriter, r *http.Request) {
-	render.Respond(w, r, auth.AuthURL(stateTMP))
+	http.SetCookie(w, &http.Cookie{
+		Name:  stateCookieName,
+		Value: stateCookieValue,
+		Path:  "",
+		//Secure:     false,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	render.Respond(w, r, map[string]string{"url": url})
 }
 
 type RCClaims struct {
@@ -28,7 +41,18 @@ type RCClaims struct {
 }
 
 func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
-	token, err := auth.Token(stateTMP, r)
+	state, _ := r.Cookie(stateCookieName)
+	http.SetCookie(w, &http.Cookie{
+		Name:   stateCookieName,
+		Value:  "",
+		Path:   "",
+		MaxAge: -1,
+		//Secure:     false,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	token, err := auth.Token(state.Value, r)
 	if err != nil {
 		render.Respond(w, r, api.NewErrorResponse(http.StatusNotFound, errors.New("couldn't get token")))
 		return
@@ -56,7 +80,7 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Respond(w, r, ss)
+	render.Respond(w, r, map[string]string{"jwt": ss})
 }
 
 func HandleDecodeJWT(w http.ResponseWriter, r *http.Request) {

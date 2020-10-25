@@ -2,18 +2,27 @@ package svc
 
 import (
 	"context"
+	"github.com/go-chi/jwtauth"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type container struct {
-	DBClient *mongo.Client
+	mongoDBClient *mongo.Client
+	tokenAuth     *jwtauth.JWTAuth
 }
 
 func (c *container) GetDBClient() *mongo.Client {
-	if c.DBClient == nil {
-		c.DBClient = MongoClient
+	if c.mongoDBClient == nil {
+		c.mongoDBClient = MongoClient
 	}
-	return c.DBClient
+	return c.mongoDBClient
+}
+
+func (c *container) GetJWTTokenAuth() *jwtauth.JWTAuth {
+	if c.tokenAuth == nil {
+		c.tokenAuth = JWTTokenAuth
+	}
+	return c.tokenAuth
 }
 
 func (c *container) Shutdown() {
