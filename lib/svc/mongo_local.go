@@ -8,15 +8,15 @@ import (
 	"time"
 )
 
-var MongoClient *mongo.Client
+var mongoLocalClient *mongo.Client
 
 func init() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("ATLAS_URI")))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		panic(err)
 	}
 
-	MongoClient = client
+	mongoLocalClient = client
 }

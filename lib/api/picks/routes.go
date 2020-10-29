@@ -9,7 +9,7 @@ import (
 func Register(r *chi.Mux) {
 	r.Route("/v1/picks", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
-			r.Use(jwtauth.Verifier(svc.Ctr.GetJWTTokenAuth()))
+			r.Use(jwtauth.Verifier(svc.Ctr.GetJWTAuth()))
 			r.Use(jwtauth.Authenticator)
 
 			r.Get("/{ThemeID}", HandleIndexTheme)

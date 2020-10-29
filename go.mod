@@ -10,4 +10,5 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/zmb3/spotify v0.0.0-20200814173021-9bec46940cc0
 	go.mongodb.org/mongo-driver v1.4.2
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 )

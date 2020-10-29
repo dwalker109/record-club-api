@@ -2,27 +2,47 @@ package svc
 
 import (
 	"context"
+	"github.com/dwalker109/record-club-api/lib/svc/tokens"
 	"github.com/go-chi/jwtauth"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type container struct {
-	mongoDBClient *mongo.Client
-	tokenAuth     *jwtauth.JWTAuth
+	mongoClient *mongo.Client
+	jwtAuth     *jwtauth.JWTAuth
+	rfTokens    *tokens.RefreshTokensMemCache
+	spTokens    *SpotifyTokensMemCache
 }
 
 func (c *container) GetDBClient() *mongo.Client {
-	if c.mongoDBClient == nil {
-		c.mongoDBClient = MongoClient
+	if c.mongoClient == nil {
+		//c.mongoClient = mongoAtlasClient
+		c.mongoClient = mongoLocalClient
 	}
-	return c.mongoDBClient
+	return c.mongoClient
 }
 
-func (c *container) GetJWTTokenAuth() *jwtauth.JWTAuth {
-	if c.tokenAuth == nil {
-		c.tokenAuth = JWTTokenAuth
+func (c *container) GetJWTAuth() *jwtauth.JWTAuth {
+	if c.jwtAuth == nil {
+		c.jwtAuth = JWTAuth
 	}
-	return c.tokenAuth
+	return c.jwtAuth
+}
+
+func (c *container) GetRefreshTokensStore() *tokens.RefreshTokensMemCache {
+	if c.rfTokens == nil {
+		cache := make(tokens.RefreshTokensMemCache)
+		c.rfTokens = &cache
+	}
+	return c.rfTokens
+}
+
+func (c *container) GetSpotifyTokensStore() *SpotifyTokensMemCache {
+	if c.spTokens == nil {
+		cache := make(SpotifyTokensMemCache)
+		c.spTokens = &cache
+	}
+	return c.spTokens
 }
 
 func (c *container) Shutdown() {
