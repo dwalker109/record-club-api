@@ -5,7 +5,6 @@ import (
 	"github.com/dchest/uniuri"
 	"github.com/dwalker109/record-club-api/lib/domain/user"
 	"github.com/dwalker109/record-club-api/lib/svc"
-	"github.com/dwalker109/record-club-api/lib/svc/tokens"
 	"net/http"
 	"time"
 
@@ -46,14 +45,14 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 	})
 
-	token, err := spAuthenticator.Token(state.Value, r)
+	spToken, err := spAuthenticator.Token(state.Value, r)
 	if err != nil {
-		render.Respond(w, r, api.NewErrorResponse(http.StatusNotFound, errors.New("couldn't get token")))
+		render.Respond(w, r, api.NewErrorResponse(http.StatusNotFound, errors.New("couldn't get spToken")))
 		return
 	}
 
-	client := spAuthenticator.NewClient(token)
-	spUser, err := client.CurrentUser()
+	spClient := spAuthenticator.NewClient(spToken)
+	spUser, err := spClient.CurrentUser()
 	if err != nil {
 		render.Respond(w, r, api.NewErrorResponse(http.StatusUnauthorized, err))
 		return
@@ -71,19 +70,19 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	at, rt, err := svc.MakeAuthTokens(rcUser.UserID)
+	atok, rtok, err := svc.Ctr.AuthService().MakeAuthTokens(rcUser.UserID)
 	if err != nil {
 		render.Respond(w, r, api.NewErrorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
-	svc.Ctr.GetSpotifyTokensStore().Store(rcUser.UserID, token)
+	svc.Ctr.SpotifyTokenStore().Store(rcUser.UserID, spToken)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:   "refresh_token",
-		Value:  rt,
-		Path:   "/tokens/refresh_token",
-		MaxAge: int(tokens.MaxAge / time.Second),
+		Value:  rtok,
+		Path:   "/tokens/refresh",
+		MaxAge: int(svc.MaxAge / time.Second),
 		//Secure:     false,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
@@ -91,7 +90,32 @@ func HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 
 	render.Respond(w, r, map[string]string{
 		"token_type":   "bearer",
-		"access_token": at,
+		"access_token": atok,
+	})
+}
+
+func HandleRefreshToken(w http.ResponseWriter, r *http.Request) {
+	key, _ := r.Cookie("refresh_token")
+
+	atok, rtok, err := svc.Ctr.AuthService().RefreshAuthTokens(key.Value)
+	if err != nil {
+		render.Respond(w, r, api.NewErrorResponse(http.StatusUnauthorized, err))
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "refresh_token",
+		Value:  rtok,
+		Path:   "/tokens/refresh",
+		MaxAge: int(svc.MaxAge / time.Second),
+		//Secure:     false,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	render.Respond(w, r, map[string]string{
+		"token_type":   "bearer",
+		"access_token": atok,
 	})
 }
 

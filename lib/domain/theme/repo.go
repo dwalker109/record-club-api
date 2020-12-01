@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var collection = svc.Ctr.GetDBClient().Database("rc").Collection("themes")
+var collection = svc.Ctr.DBClient().Database("rc").Collection("themes")
 var ctx = context.Background()
 
 func GetAll() (*[]Entity, error) {

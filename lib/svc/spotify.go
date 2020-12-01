@@ -5,12 +5,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type SpotifyTokensMemCache map[primitive.ObjectID]*oauth2.Token
+type spotifyTokenMemCache map[primitive.ObjectID]*oauth2.Token
 
-func (t *SpotifyTokensMemCache) Store(id primitive.ObjectID, token *oauth2.Token) {
+func (t *spotifyTokenMemCache) Store(id primitive.ObjectID, token *oauth2.Token) {
 	(*t)[id] = token
 }
 
-func (t *SpotifyTokensMemCache) Clear(id primitive.ObjectID) {
+func (t *spotifyTokenMemCache) Clear(id primitive.ObjectID) {
 	delete(*t, id)
 }

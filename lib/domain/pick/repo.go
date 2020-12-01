@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var collection = svc.Ctr.GetDBClient().Database("rc").Collection("picks")
+var collection = svc.Ctr.DBClient().Database("rc").Collection("picks")
 var ctx = context.Background()
 
 func GetThemePicks(themeID primitive.ObjectID) (*[]Entity, error) {

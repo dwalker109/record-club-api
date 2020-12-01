@@ -1,4 +1,4 @@
-package tokens
+package svc
 
 import (
 	"github.com/dgrijalva/jwt-go"
@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-func MakeAccessToken(id primitive.ObjectID, signingKey []byte) (string, error) {
+type accessTokenService struct{}
+
+func (a accessTokenService) makeAccessToken(id primitive.ObjectID, signingKey []byte) (string, error) {
 	claims := jwt.StandardClaims{
 		Subject:   id.String(),
 		Issuer:    "rc",

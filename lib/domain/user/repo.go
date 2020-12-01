@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	coll = svc.Ctr.GetDBClient().Database("rc").Collection("users")
+	coll = svc.Ctr.DBClient().Database("rc").Collection("users")
 	ctx  = context.Background()
 )
 
